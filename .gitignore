@@ -1,0 +1,10 @@
+*.class
+
+dependency-reduced-pom.xml
+
+*.iml
+*~
+
+**/target
+
+*.xml
