@@ -33,7 +33,7 @@ final class Utils {
     }
 
     static Set<ShamirShare> fromStringRepresentation(final Set<String> values) {
-        return values.stream().map(i -> fromStringRepresentation(i)).collect(Collectors.toSet());
+        return values.stream().map(Utils::fromStringRepresentation).collect(Collectors.toSet());
     }
 
     static String toStringRepresentation(final ShamirShare share) {
@@ -44,7 +44,7 @@ final class Utils {
     static Set<String> toStringRepresentation(final Set<ShamirShare> shares) {
         return shares
                 .stream()
-                .map(i -> toStringRepresentation(i))
+                .map(Utils::toStringRepresentation)
                 .collect(Collectors.toSet());
     }
 }

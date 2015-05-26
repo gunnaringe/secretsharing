@@ -3,7 +3,7 @@ package io.github.gunnaringe.secretsharing;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Map;
@@ -38,9 +38,8 @@ public final class Shamir {
         requireNonNull(secret, "secret can not be null");
 
         final Map<Integer, BigInteger> coefficient = getCoefficients(threshold, prime);
-
-        final ImmutableList.Builder<ShamirShare> shares = ImmutableList.builder();
-        for (int i = 1; i <= numberOfShares; i++) {
+        final Set<ShamirShare> shares = Sets.newConcurrentHashSet();
+        IntStream.rangeClosed(1, numberOfShares).parallel().forEach(i -> {
             BigInteger accumulate = secret;
             for (int j = 1; j < threshold; j++) {
                 final BigInteger t1 = BigInteger.valueOf(i).modPow(BigInteger.valueOf(j), prime);
@@ -48,8 +47,8 @@ public final class Shamir {
                 accumulate = accumulate.add(t2).mod(prime);
             }
             shares.add(ImmutableShamirShare.builder().index(i - 1).value(accumulate).build());
-        }
-        return ImmutableResult.builder().addAllShares(shares.build()).prime(prime).build();
+        });
+        return ImmutableResult.builder().addAllShares(shares).prime(prime).build();
     }
 
     public static byte[] combine(final BigInteger prime, final Set<ShamirShare> shares) {
