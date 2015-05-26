@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public final class Shamir {
 
@@ -23,9 +24,10 @@ public final class Shamir {
 
     public static Result split(final int threshold, final int numberOfShares, final byte[] secret) {
         final BigInteger secretInteger = new BigInteger(secret);
-        final BigInteger prime = new BigInteger(secretInteger.bitLength() + 1, CERTAINTY, random);
+        final BigInteger prime = findPrime(secretInteger);
         return split(threshold, numberOfShares, prime, secretInteger);
     }
+
 
     private static Result split(final int threshold, final int numberOfShares, final BigInteger prime, final BigInteger secret) {
         checkArgument(threshold <= numberOfShares, "threshold must be less or equal to number of shares");
@@ -47,7 +49,7 @@ public final class Shamir {
         return ImmutableResult.builder().addAllShares(shares.build()).prime(prime).build();
     }
 
-    public static byte[] combine(final BigInteger prime, final List<ShamirShare> shares) {
+    public static byte[] combine(final BigInteger prime, final Set<ShamirShare> shares) {
         requireNonNull(prime, "prime can not be null");
         requireNonNull(shares, "shares can not be null");
 
@@ -72,6 +74,10 @@ public final class Shamir {
             coefficient.add(getPrimeBetweenZeroAndPrime(prime));
         }
         return coefficient.build();
+    }
+
+    public static BigInteger findPrime(final BigInteger secretInteger) {
+        return new BigInteger(secretInteger.bitLength() + 1, CERTAINTY, random);
     }
 
     private static BigInteger getPrimeBetweenZeroAndPrime(final BigInteger prime) {
