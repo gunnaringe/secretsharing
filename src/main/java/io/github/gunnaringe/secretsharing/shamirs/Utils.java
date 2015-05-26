@@ -4,15 +4,13 @@ import static com.google.common.io.BaseEncoding.base64Url;
 import static com.google.common.io.Resources.getResource;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import io.github.gunnaringe.secretsharing.ImmutableShamirShare;
 import io.github.gunnaringe.secretsharing.ShamirShare;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /** Package-Private */
 final class Utils {
@@ -35,13 +33,7 @@ final class Utils {
     }
 
     static Set<ShamirShare> fromStringRepresentation(final Set<String> values) {
-        // TODO(gunnaringe): Use lambas
-        return ImmutableSet.copyOf(Collections2.transform(values, new Function<String, ShamirShare>() {
-            @Override
-            public ShamirShare apply(String input) {
-                return fromStringRepresentation(input);
-            }
-        }));
+        return values.stream().map(i -> fromStringRepresentation(i)).collect(Collectors.toSet());
     }
 
     static String toStringRepresentation(final ShamirShare share) {
@@ -50,11 +42,9 @@ final class Utils {
     }
 
     static Set<String> toStringRepresentation(final Set<ShamirShare> shares) {
-        return ImmutableSet.copyOf(Collections2.transform(shares, new Function<ShamirShare, String>() {
-                    @Override
-                    public String apply(final ShamirShare input) {
-                        return toStringRepresentation(input);
-                    }
-                }));
+        return shares
+                .stream()
+                .map(i -> toStringRepresentation(i))
+                .collect(Collectors.toSet());
     }
 }

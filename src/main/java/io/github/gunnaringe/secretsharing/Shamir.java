@@ -6,9 +6,11 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 
 public final class Shamir {
 
@@ -35,7 +37,8 @@ public final class Shamir {
         checkArgument(numberOfShares > 0, "number of shares must be positive");
         requireNonNull(secret, "secret can not be null");
 
-        final List<BigInteger> coefficient = getCoefficient(threshold, prime);
+        final Map<Integer, BigInteger> coefficient = getCoefficients(threshold, prime);
+
         final ImmutableList.Builder<ShamirShare> shares = ImmutableList.builder();
         for (int i = 1; i <= numberOfShares; i++) {
             BigInteger accumulate = secret;
@@ -68,12 +71,13 @@ public final class Shamir {
         return accumulate.toByteArray();
     }
 
-    private static List<BigInteger> getCoefficient(final int threshold, final BigInteger prime) {
-        final ImmutableList.Builder<BigInteger> coefficient = ImmutableList.builder();
-        for (int i = 0; i < threshold - 1; i++) {
-            coefficient.add(getPrimeBetweenZeroAndPrime(prime));
-        }
-        return coefficient.build();
+    private static Map<Integer, BigInteger> getCoefficients(final int threshold, final BigInteger prime) {
+        final Map<Integer, BigInteger> map = new ConcurrentHashMap<>();
+        IntStream
+                .range(0, threshold - 1)
+                .parallel()
+                .forEach(i -> map.put(i, getPrimeBetweenZeroAndPrime(prime)));
+        return map;
     }
 
     public static BigInteger findPrime(final BigInteger secretInteger) {

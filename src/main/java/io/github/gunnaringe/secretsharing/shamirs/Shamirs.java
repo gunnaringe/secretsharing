@@ -19,7 +19,7 @@ public class Shamirs {
         this.limit = limit;
     }
 
-    public static Shamirs of(final BigInteger prime) {
+    public static Shamirs prime(final BigInteger prime) {
         return new Shamirs(prime, -1);
     }
 

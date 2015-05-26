@@ -34,8 +34,8 @@ public class ShamirsTest {
 
         final Stopwatch stopWatch = Stopwatch.createStarted();
         final BigInteger prime = Shamirs.findPrime(secret);
-        final Set<String> shares = Shamirs.of(prime).split(threshold, numberOfShares, secret);
-        byte[] combined = Shamirs.of(prime).combine(shares);
+        final Set<String> shares = Shamirs.prime(prime).split(threshold, numberOfShares, secret);
+        byte[] combined = Shamirs.prime(prime).combine(shares);
         stopWatch.stop();
 
         assertThat(combined).isEqualTo(secret);
